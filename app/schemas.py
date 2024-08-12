@@ -31,38 +31,59 @@ class Baralho(BaralhoBase):
 class HabilidadeBase(BaseModel):
     nome: str
     descricao: str
-    nivel: int
 
 class HabilidadeCreate(HabilidadeBase):
     pass
 
 class Habilidade(HabilidadeBase):
     id: int
-    personagem_id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+class PersonagemModeloBase(BaseModel):
+    nome: str
+    foto: str
+    descricao: str
+
+class PersonagemModeloResponse(PersonagemModeloBase):
+    id: int
+    habilidades: List[Habilidade] = []
+
+    class Config:
+        orm_mode = True
+
+class PersonagemModeloCreate(PersonagemModeloBase):
+    habilidades: List[dict]  # Lista de dicionários com habilidade_id e nivel
+
+class PersonagemModelo(PersonagemModeloBase):
+    id: int
+    habilidades: List[dict]  # Lista de dicionários com habilidade e nivel
 
     class Config:
         orm_mode = True
 
 class PersonagemBase(BaseModel):
-    nome: str
     pontos_de_vida: int
     nivel: int
     pontos_de_experiencia: int
 
 class PersonagemCreate(PersonagemBase):
-    habilidades: List[HabilidadeCreate]
+    habilidades: List[int]
     jogador_id: int
+    modelo_id: int  # Referência ao PersonagemModelo
 
 class Personagem(PersonagemBase):
     id: int
-    habilidades: List[Habilidade]
+    habilidades: List[int]
+    modelo: PersonagemModelo  # Inclui detalhes do modelo
 
     class Config:
         orm_mode = True
 
 class JogadorBase(BaseModel):
     nome: str
-    token: str  # Adicione o campo token
+    token: str
 
 class JogadorCreate(JogadorBase):
     pass
@@ -73,3 +94,6 @@ class Jogador(JogadorBase):
 
     class Config:
         orm_mode = True
+
+class LoginData(BaseModel):
+    nome: str
